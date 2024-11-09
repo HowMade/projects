@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charst="utf-8"/>
+    <title>lianliankan</title>
+	<style>
+	  body{
+		background-color: #C4E393;
+	  }
+
+	  #game_place{
+		margin: auto;
+		max-width: 1300px;
+		height: 954px;
+		background-image: url("bg.jpg");
+	  }
+	  
+	  table{
+		margin: auto;
+	    width:610px;
+		height:610px;
+		background-color:hsla(0,100%,100%,0%);
+	  }
+	  
+	  img{
+	    width:150px;
+	    height:150px;
+		margin:0px 2px 0px 2px;
+		background-color:hsla(0,100%,100%,0%);
+	  }
+	  
+	  td{
+	    width:150px;
+		height:150px;
+		cursor:pointer;
+		}
+	  
+	  td:hover{
+		transform: scale(1.2,1.2);
+	  }
+	  
+	  tr {
+	    background-color:hsla(0,0,0%,100%);
+	  }
+	 
+	 .p00{
+	    background:url("00.png") no-repeat;
+		}
+		
+	  .p01{
+	    background:url("01.png") no-repeat;
+		}
+	  
+	  .p02{
+	    background:url("02.png") no-repeat;
+		}
+	 
+	  .p03{
+	    background:url("03.png") no-repeat;
+		}
+	
+	  .p04{
+	    background:url("04.png") no-repeat;
+		}
+	  
+	  .p05{
+	    background:url("05.png") no-repeat;
+		}
+	  
+	  .p06{
+	    background:url("06.png") no-repeat;
+		}
+	  
+	  .p07{
+	    background:url("07.png") no-repeat;
+		}
+	  
+	</style>
+	<script>
+	window.onload=init;
+	  
+	var containerClassNames="0";
+	var containerImagesIds="0";
+	var counter = 0;
+	var all_counter = 0;
+	var backgroundSound = document.createElement("audio");
+	var openSound = document.createElement("audio");
+	var wrongSound = document.createElement("audio");
+	var successSound = document.createElement("audio");
+	var finshedSound = document.createElement("audio");
+	backgroundSound.src = "background_sound.mp3";
+	openSound.src = "open.mp3";
+	wrongSound.src = "wrong.mp3";
+	successSound.src = "success.mp3";
+	finshedSound.src = "finshed.mp3";
+	var play_music = false;
+	 
+	 function init(){
+		
+		generatePic();
+		
+		setTimeout(generateCovers,5000);
+
+		setTimeout(startGame,5000);
+	 }
+	
+	  function generatePic(){
+
+	    var b1=[];//names of class;
+		var tds=document.getElementsByTagName("td");//all of those tags of "td";
+
+       for(var i=0;i<16;i++){
+         b1[i]=i%8;
+       }
+
+       for(var i=0;i<16;i++){
+         var ran=Math.floor(Math.random()*16);
+		 var k;
+		 k=b1[i];
+		 b1[i]=b1[ran];
+		 b1[ran]=k;//discrupt elements of  b1
+       }
+	 
+	   for(var i=0;i<16;i++){
+	     b1[i]="p"+"0"+b1[i];
+	   }
+	    
+		for(var i=0;i<16;i++){
+		 tds[i].setAttribute("class",b1[i]); 
+		}
+	}
+	  
+	  function generateCovers(){
+	    var images=document.getElementsByTagName("img");
+		for(var i=0;i<images.length;i++){
+		  images[i].src="88.jpg";
+		}
+	  }
+	  
+	  function startGame(){
+		
+		var imgs = document.getElementsByTagName("img");
+		
+		for(var i = 0; i < imgs.length; i++){
+		  imgs[i].addEventListener("click", parseGuess);
+		}
+		
+	  }
+	  
+	function parseGuess(eventObj){
+		if(!play_music){
+			setInterval(() => {backgroundSound.play();}, 5000);
+			play_music = true;
+		}
+	    coverUp(eventObj);
+		//keep tds's class names
+		containerClassNames += eventObj.target.parentElement.className;
+		containerImagesIds +=eventObj.target.id;
+		counter ++;
+		if(counter == 2){
+		  //keep those names of classes
+			var theFirstClassName=containerClassNames.charAt(3);
+			var theSecondClassName=containerClassNames.charAt(6);
+			var theFirstImgsId=containerImagesIds.charAt(1) + containerImagesIds.charAt(2);
+			var theSecondImgsId=containerImagesIds.charAt(3) + containerImagesIds.charAt(4);
+		  
+			if(theFirstClassName==theSecondClassName && theFirstImgsId != theSecondImgsId){
+				setTimeout(delGrid,400);
+				all_counter ++;
+				if(all_counter >= 8){finshedSound.play()}else{successSound.play();}
+			}else{
+				setTimeout(coverDown,1000);
+				wrongSound.play();
+			}
+		}else{
+			openSound.play();
+		}
+	}
+
+	function coverUp(eventObj){eventObj.target.src="tm.png";}
+	  
+	function coverDown(){
+		   //keep those two ids of images
+		  var theFirstImgsId=containerImagesIds.charAt(1) + containerImagesIds.charAt(2);
+		  var theSecondImgsId=containerImagesIds.charAt(3) + containerImagesIds.charAt(4);
+		  document.getElementById(theFirstImgsId).src="88.jpg";
+		  document.getElementById(theSecondImgsId).src="88.jpg";
+		  containerClassNames = "0";
+		  containerImagesIds = "0";
+		  counter = 0;
+	}
+	
+	function delGrid(){
+		var theFirstImgsId=containerImagesIds.charAt(1) + containerImagesIds.charAt(2);
+		var theSecondImgsId=containerImagesIds.charAt(3) + containerImagesIds.charAt(4);
+		document.getElementById(theFirstImgsId).removeEventListener("click", parseGuess);
+		document.getElementById(theSecondImgsId).removeEventListener("click", parseGuess);
+
+	    var theFirstImgsId=containerImagesIds.charAt(1) + containerImagesIds.charAt(2);
+		var theSecondImgsId=containerImagesIds.charAt(3) + containerImagesIds.charAt(4);
+		document.getElementById(theFirstImgsId).src="000.png";
+		document.getElementById(theSecondImgsId).src="000.png";
+		containerImagesIds="0";//initialize
+		containerClassNames="0";
+		counter = 0;
+	}
+	
+	</script>
+  </head>
+  <body>
+	<div id="game_place">
+		<table>
+			<tr>
+			  <td id="000" ><img id="00" /></td><td id="001"><img id="01"/></td><td id="002"/><img id="02" /></td><td id="003"><img id="03" /></td>
+			</tr>
+			<tr>
+			  <td id="010"><img id="10" /></td><td id="011"><img id="11" /></td><td id="012"><img id="12" /></td><td id="013"><img id="13" /></td>
+			</tr>
+			<tr>
+			  <td id="020"><img id="20"/></td><td id="021"><img id="21" /></td><td id="022"><img id="22" /></td><td id="023"><img id="23" /></td>
+			</tr>
+			<tr>
+			  <td id="030"><img id="30" /></td><td id="031"><img id="31" /></td><td id="032"><img id="32"/></td><td id="033"><img id="33"/></td>
+			</tr>
+		  </table>
+	</div>
+  </body>
+</html>
